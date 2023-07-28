@@ -33,7 +33,6 @@ fi
 
 # STOP ALFRESCO
 if [ $STOP == true ]; then
-
   if [ $FROM_MOUNT == true ]; then
 	  echo "$(nowstamp) Stopping Alfresco Service" 2>&1 | tolog
 	  ssh $FROM_SSH_REMOTE "service alfresco stop" 2>&1 | tolog
@@ -275,9 +274,15 @@ restic backup ${FROM}/ \
 
 # START ALFRESCO
 if [ $STOP == true ]; then
-	echo "$(nowstamp) Starting Alfresco Service..." 2>&1 | tolog
-	ssh $FROM_SSH_REMOTE "service alfresco start" 2>&1 | tolog
-	# sleep 5s
+  if [ $FROM_MOUNT == true ]; then
+	  echo "$(nowstamp) Starting Alfresco Service..." 2>&1 | tolog
+	  ssh $FROM_SSH_REMOTE "service alfresco start"  2>&1 | tolog
+	  # sleep 5s
+  else
+	  echo "$(nowstamp) Starting Alfresco Service..." 2>&1 | tolog
+	  service alfresco start  2>&1 | tolog
+	  # sleep 5s
+  fi
 fi
 
 # UNMOUNT UNIT
