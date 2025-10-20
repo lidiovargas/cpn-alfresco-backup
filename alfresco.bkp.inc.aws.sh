@@ -44,11 +44,12 @@ if [ $STOP == true ]; then
     sleep 10s
   else
 	  echo "$(nowstamp) Stopping Alfresco Service" 2>&1 | tolog
-	  service alfresco stop 2>&1 | tolog
-	  echo "Awaiting 120s..." | tolog
-    sleep 120s
-	  echo "$(nowstamp) Restart Alfresco Database..." 2>&1 | tolog
-	  $FROM_DB_LOCAL/scripts/ctl.sh start 2>&1 | tolog
+	  #service alfresco stop 2>&1 | tolog
+	  #echo "Awaiting 120s..." | tolog
+    #sleep 120s
+	  #echo "$(nowstamp) Restart Alfresco Database..." 2>&1 | tolog
+	  #$FROM_DB_LOCAL/scripts/ctl.sh start 2>&1 | tolog
+    docker stop acs1 | tolog
 	  echo "Awaiting 10s..." | tolog
     sleep 10s
   fi
@@ -117,59 +118,59 @@ restic backup $FROM \
    2>&1 | tolog
 
 # SETTINGS
-FROM=${FROM_LOCAL_PATH}/tomcat/shared/classes/alfresco-global.properties
-echo $(nowstamp) Backup $FROM 2>&1 | tolog
-restic backup $FROM \
-	--limit-upload $LIMIT_UPLOAD \
-	--limit-download $LIMIT_DOWNLOAD \
-	--verbose 0 \
-	--no-scan \
-  2>&1 | tolog
+#FROM=${FROM_LOCAL_PATH}/tomcat/shared/classes/alfresco-global.properties
+#echo $(nowstamp) Backup $FROM 2>&1 | tolog
+#restic backup $FROM \
+#	--limit-upload $LIMIT_UPLOAD \
+#	--limit-download $LIMIT_DOWNLOAD \
+#	--verbose 0 \
+#	--no-scan \
+#  2>&1 | tolog
 
-FROM=${FROM_LOCAL_PATH}/tomcat/conf/server.xml
-echo $(nowstamp) Backup $FROM 2>&1 | tolog
-restic backup $FROM \
-	--limit-upload $LIMIT_UPLOAD \
-	--limit-download $LIMIT_DOWNLOAD \
-	--verbose 0 \
-	--no-scan \
-  2>&1 | tolog
+#FROM=${FROM_LOCAL_PATH}/tomcat/conf/server.xml
+#echo $(nowstamp) Backup $FROM 2>&1 | tolog
+#restic backup $FROM \
+#	--limit-upload $LIMIT_UPLOAD \
+#	--limit-download $LIMIT_DOWNLOAD \
+#	--verbose 0 \
+#	--no-scan \
+#  2>&1 | tolog
 
-FROM=${FROM_LOCAL_PATH}/tomcat/shared/classes/alfresco/web-extension/share-config-custom.xml
-echo $(nowstamp) Backup $FROM 2>&1 | tolog
-restic backup $FROM \
-	--limit-upload $LIMIT_UPLOAD \
-	--limit-download $LIMIT_DOWNLOAD \
-	--verbose 0 \
-	--no-scan \
-  2>&1 | tolog
+#FROM=${FROM_LOCAL_PATH}/tomcat/shared/classes/alfresco/web-extension/share-config-custom.xml
+#echo $(nowstamp) Backup $FROM 2>&1 | tolog
+#restic backup $FROM \
+#	--limit-upload $LIMIT_UPLOAD \
+#	--limit-download $LIMIT_DOWNLOAD \
+#	--verbose 0 \
+#	--no-scan \
+#  2>&1 | tolog
 
-FROM=${FROM_LOCAL_PATH}/solr4/archive-SpacesStore/conf/solrcore.properties
-echo $(nowstamp) Backup $FROM 2>&1 | tolog
-restic backup $FROM \
-	--limit-upload $LIMIT_UPLOAD \
-	--limit-download $LIMIT_DOWNLOAD \
-	--verbose 2 \
-   2>> $LOG
+#FROM=${FROM_LOCAL_PATH}/solr4/archive-SpacesStore/conf/solrcore.properties
+#echo $(nowstamp) Backup $FROM 2>&1 | tolog
+#restic backup $FROM \
+#	--limit-upload $LIMIT_UPLOAD \
+#	--limit-download $LIMIT_DOWNLOAD \
+#	--verbose 2 \
+#   2>> $LOG
 
-FROM=${FROM_LOCAL_PATH}/solr4/workspace-SpacesStore/conf/solrcore.properties
-echo $(nowstamp) Backup $FROM 2>&1 | tolog
-restic backup $FROM \
-	--limit-upload $LIMIT_UPLOAD \
-	--limit-download $LIMIT_DOWNLOAD \
-	--verbose 0 \
-	--no-scan \
-  2>&1 | tolog
+#FROM=${FROM_LOCAL_PATH}/solr4/workspace-SpacesStore/conf/solrcore.properties
+#echo $(nowstamp) Backup $FROM 2>&1 | tolog
+#restic backup $FROM \
+#	--limit-upload $LIMIT_UPLOAD \
+#	--limit-download $LIMIT_DOWNLOAD \
+#	--verbose 0 \
+#	--no-scan \
+#  2>&1 | tolog
 
 # APLICAÇÕES SECUNDÁRIAS
-FROM=/opt/alfresco-tree
-echo $(nowstamp) Backup $FROM/ 2>&1 | tolog
-restic backup ${FROM}/ \
-	--limit-upload $LIMIT_UPLOAD \
-	--limit-download $LIMIT_DOWNLOAD \
-	--verbose 0 \
-	--no-scan \
-  2>&1 | tolog
+#FROM=/opt/alfresco-tree
+#echo $(nowstamp) Backup $FROM/ 2>&1 | tolog
+#restic backup ${FROM}/ \
+#	--limit-upload $LIMIT_UPLOAD \
+#	--limit-download $LIMIT_DOWNLOAD \
+#	--verbose 0 \
+#	--no-scan \
+#  2>&1 | tolog
 
 FROM=/opt/alfresco-backup
 echo $(nowstamp) Backup $FROM/ 2>&1 | tolog
@@ -254,14 +255,14 @@ restic backup ${FROM}/ \
 	--no-scan \
   2>&1 | tolog
 
-FROM=/opt/cert-monitor
-echo $(nowstamp) Backup $FROM/ 2>&1 | tolog
-restic backup ${FROM}/ \
-	--limit-upload $LIMIT_UPLOAD \
-	--limit-download $LIMIT_DOWNLOAD \
-	--verbose 0 \
-	--no-scan \
-  2>&1 | tolog
+#FROM=/opt/cert-monitor
+#echo $(nowstamp) Backup $FROM/ 2>&1 | tolog
+#restic backup ${FROM}/ \
+#	--limit-upload $LIMIT_UPLOAD \
+#	--limit-download $LIMIT_DOWNLOAD \
+#	--verbose 0 \
+#	--no-scan \
+#  2>&1 | tolog
 
 FROM=/opt/backup-all
 echo $(nowstamp) Backup $FROM/ 2>&1 | tolog
@@ -280,7 +281,8 @@ if [ $STOP == true ]; then
 	  # sleep 5s
   else
 	  echo "$(nowstamp) Starting Alfresco Service..." 2>&1 | tolog
-	  service alfresco start  2>&1 | tolog
+	  #service alfresco start  2>&1 | tolog
+    docker start acs1
 	  # sleep 5s
   fi
 fi
