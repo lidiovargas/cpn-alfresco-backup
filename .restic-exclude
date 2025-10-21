@@ -1,0 +1,16 @@
+# Excluir a pasta de secrets do projeto
+
+/srv/data/alfresco-infra/alfresco-docker/secrets
+/srv/data/alfresco-infra/backup/secrets
+
+# Excluir a pasta do git
+
+<!-- /srv/data/alfresco-infra/backup/.git -->
+
+# Excluir ficheiros de log e do sistema operativo
+
+.DS_Store
+
+# Excluir o backup da base de dados se estiver na pasta do projeto
+
+/srv/data/alfresco-infra/alfresco-docker/db_dump/alfresco-db.sql

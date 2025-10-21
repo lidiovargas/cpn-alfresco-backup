@@ -1,0 +1,89 @@
+services:
+  backup:
+    build: ./ # Diz para construir a imagem a partir da pasta backup/
+    container_name: alfresco_backup
+    hostname: luna # Define um hostname estático para o container
+    environment:
+      - RESTIC_REPOSITORY=s3:s3.us-east-2.amazonaws.com/cpn-alfresco-bkp-inc
+      - RESTIC_PASSWORD_FILE=/run/secrets/restic_password
+      - AWS_ACCESS_KEY_ID_FILE=/run/secrets/aws_access_key_id # precisa ser convertido em entrypoin.sh de _FILE para dados na variável
+      - AWS_SECRET_ACCESS_KEY_FILE=/run/secrets/aws_secret_access_key # precisa ser convertido em entrypoin.sh de _FILE para dados na variável
+      - AWS_DEFAULT_REGION=us-east-2
+      - ALFRESCO_DB_NAME=alfresco
+      - ALFRESCO_DB_USER=postgres
+      - ALFRESCO_DB_PASSWORD_FILE=/run/secrets/db_password # precisa ser convertido em entrypoin.sh de _FILE para dados na variável
+      - ALFRESCO_DB_HOST=postgres # Aponta para o nome do serviço do postgres na outra compose file, acessível pela rede "alfresco_net"
+      - ALFRESCO_DB_PORT=5432
+    volumes:
+      - ./logs/:/app/logs
+      - /srv/data/alfresco-community/alf_data:/srv/data/alfresco-community/alf_data:ro
+      - /srv/data/alfresco-infra:/srv/data/alfresco-infra:ro
+      - /srv/data/http-proxy:/srv/data/http-proxy:ro
+      - /srv/data/backup-all:/srv/data/backup-all:ro
+      - /var/run/docker.sock:/var/run/docker.sock # Monta o socket do Docker
+      - restic_cache:/root/.cache/restic # Persiste o cache do restic no host
+    secrets:
+      - restic_password
+      - aws_access_key_id
+      - aws_secret_access_key
+      - db_password
+    networks:
+      - alfresco_net
+    # Por defeito, não faz nada. Será executado manualmente ou por um cron.
+
+  backup-mount:
+    extends:
+      service: backup
+    profiles:
+      - mount # Este serviço só será ativado com a flag --profile mount
+    cap_add:
+      - SYS_ADMIN # Permissão necessária para 'mount'
+    devices:
+      - /dev/fuse:/dev/fuse # Dispositivo necessário para 'mount'
+    security_opt:
+      - 'apparmor:unconfined' # Necessário em hosts com AppArmor
+
+  cron:
+    build: ./cron
+    container_name: alfresco_cron
+    restart: always
+    healthcheck:
+      test: ['CMD-SHELL', "ps | grep '[c]rond'"]
+      interval: 60s # Não precisa de ser verificado com muita frequência.
+      timeout: 10s
+      retries: 3
+    environment:
+      - ALERT_EMAIL=lidio.vargas@cpn.com.br
+      - HOST_PROJECT_PATH=/srv/data/alfresco-infra/backup
+    volumes:
+      # Compartilha o socket do Docker do host para que possamos correr comandos 'docker'
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ./logs/:/app/logs
+      - /srv/data/alfresco-community/alf_data:/srv/data/alfresco-community/alf_data:ro
+      - /srv/data/alfresco-infra:/srv/data/alfresco-infra:ro
+      - /srv/data/http-proxy:/srv/data/http-proxy:ro
+      - /srv/data/backup-all:/srv/data/backup-all:ro
+    secrets:
+      - source: msmtp_config # serviço de email
+        target: /etc/msmtprc
+        mode: 0600
+
+networks:
+  alfresco_net:
+    name: alfresco_net # Nome explícito definido no outro compose
+    external: true # Informa ao Docker que esta rede já existe
+
+volumes:
+  restic_cache: # Define o volume nomeado para o cache do restic
+
+secrets:
+  db_password:
+    file: ./secrets/db_password.txt # Caminho para o arquivo no seu computador
+  restic_password:
+    file: ./secrets/restic_password.txt
+  aws_access_key_id:
+    file: ./secrets/aws_access_key_id.txt
+  aws_secret_access_key:
+    file: ./secrets/aws_secret_access_key.txt
+  msmtp_config:
+    file: ./secrets/msmtprc.txt # Caminho configuração serviço email
