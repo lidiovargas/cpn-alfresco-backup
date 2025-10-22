@@ -30,17 +30,6 @@ echo -n 'sua_senha' > ./secrets/db_password.txt
 echo -n 'sua_senha' > ./secrets/restic_password.txt
 echo -n 'sua_senha' > ./secrets/aws_access_key_id.txt
 echo -n 'sua_senha' > ./secrets/aws_secret_access_key.txt
-cat > secrets/msmtprc.txt << EOF
-account        default
-host           smtp.gmail.com
-port           587
-auth           on
-tls            on
-tls_trust_file /etc/ssl/certs/ca-certificates.crt
-from           alfresco@cpn.com.br
-user           alfresco@cpn.com.br
-password       sua-senha-de-app-de-16-caracteres-aqui
-EOF
 # Reabilite o histórico do shell
 set -o history
 
@@ -126,20 +115,6 @@ docker exec -it restic_mount_process ls -l /mnt/restic/ids/SNAPSHOT_ID/
 > Custaria muito caro (tempo) aplicar essa montagem, já que meu repositório está na AWS S3 e tem 2.5T aberto (ou 1T armazenado), com aproximadadmente 6000 snapshots?
 > A resposta curta é: não, não custará caro em tempo para iniciar a montagem, mesmo com um repositório tão grande.
 > A "mágica" do restic mount é que ele funciona como um sistema de arquivos virtual sob demanda.
-
-# Agendamento automático
-
-Para rodar o agendamento automático, é necessário subir:
-
-```bash
-docker compose up -d --build
-```
-
-Para verificar os logs em tempo real:
-
-```bash
-docker logs  alfresco_cron -f
-```
 
 # Como controlar outros Containers de dentro de um container?
 

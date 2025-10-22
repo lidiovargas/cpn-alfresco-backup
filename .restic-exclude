@@ -5,7 +5,7 @@
 
 # Excluir a pasta do git
 
-<!-- /srv/data/alfresco-infra/backup/.git -->
+# <!-- /srv/data/alfresco-infra/backup/.git -->
 
 # Excluir ficheiros de log e do sistema operativo
 

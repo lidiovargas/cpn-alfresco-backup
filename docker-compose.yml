@@ -43,31 +43,6 @@ services:
     security_opt:
       - 'apparmor:unconfined' # Necessário em hosts com AppArmor
 
-  cron:
-    build: ./cron
-    container_name: alfresco_cron
-    restart: always
-    healthcheck:
-      test: ['CMD-SHELL', "ps | grep '[c]rond'"]
-      interval: 60s # Não precisa de ser verificado com muita frequência.
-      timeout: 10s
-      retries: 3
-    environment:
-      - ALERT_EMAIL=lidio.vargas@cpn.com.br
-      - HOST_PROJECT_PATH=/srv/data/alfresco-infra/backup
-    volumes:
-      # Compartilha o socket do Docker do host para que possamos correr comandos 'docker'
-      - /var/run/docker.sock:/var/run/docker.sock
-      - ./logs/:/app/logs
-      - /srv/data/alfresco-community/alf_data:/srv/data/alfresco-community/alf_data:ro
-      - /srv/data/alfresco-infra:/srv/data/alfresco-infra:ro
-      - /srv/data/http-proxy:/srv/data/http-proxy:ro
-      - /srv/data/backup-all:/srv/data/backup-all:ro
-    secrets:
-      - source: msmtp_config # serviço de email
-        target: /etc/msmtprc
-        mode: 0600
-
 networks:
   alfresco_net:
     name: alfresco_net # Nome explícito definido no outro compose
@@ -85,5 +60,3 @@ secrets:
     file: ./secrets/aws_access_key_id.txt
   aws_secret_access_key:
     file: ./secrets/aws_secret_access_key.txt
-  msmtp_config:
-    file: ./secrets/msmtprc.txt # Caminho configuração serviço email
