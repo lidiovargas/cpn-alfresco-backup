@@ -89,13 +89,13 @@ docker compose run --rm backup restic forget --prune SNAPSHOT_ID
 Se precisar montar uma unidade de snapshot, para verificar o que tem nela (só funciona no Linux):
 
 ```bash
+# adicione seu usuário ao grupo `fuse`, para evitar erros de permissão em hosts com AppArmor
+sudo usermod -aG fuse $USER
 # (Num terminal) Crie uma pasta temporária e monte o repositório.
 # Este comando ficará em execução, mantendo a montagem ativa.
 mkdir -p ./mount_temp
-# adicione seu usuário ao grupo `fuse`, para evitar erros de permissão em hosts com AppArmor
-sudo usermod -aG fuse $USER
 # Rode a montagem
-docker compose --profile mount run --build --rm --name restic_mount_process -v "$(pwd)/mount_temp":/mnt/restic backup-mount restic mount /mnt/restic
+docker compose run --build --rm --name restic_mount_process -v "$(pwd)/mount_temp":/mnt/restic backup-mount restic mount /mnt/restic
 
 > NOTA: A montagem acontece DENTRO do container e não é visível diretamente na pasta local.
 > Use `docker exec` para interagir com os arquivos montados.

@@ -2,6 +2,7 @@ services:
   backup:
     build: ./ # Diz para construir a imagem a partir da pasta backup/
     container_name: alfresco_backup
+    image: cpn/alfresco-backup
     hostname: luna # Define um hostname estático para o container
     environment:
       - RESTIC_REPOSITORY=s3:s3.us-east-2.amazonaws.com/cpn-alfresco-bkp-inc
