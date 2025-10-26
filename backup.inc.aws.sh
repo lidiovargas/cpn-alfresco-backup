@@ -124,31 +124,6 @@ restic backup ${FROM}/ \
   EXIT_CODE=1
 }
 
-
-# APLICAÇÕES QUE NÃO ENVOLVEM SÓ O ALFRESCO
-
-FROM=/srv/data/http-proxy
-echo $(nowstamp) Backup $FROM/ 2>&1 | tolog
-restic backup ${FROM}/ \
-	--limit-upload $LIMIT_UPLOAD \
-	--limit-download $LIMIT_DOWNLOAD \
-	--no-scan \
-	--verbose 0 2>&1 | tolog || {
-  ERROR_MESSAGES="${ERROR_MESSAGES}[ERRO] Falha ao fazer backup do http-proxy ($FROM) com restic.\n"
-  EXIT_CODE=1
-}
-
-FROM=/srv/data/backup-all
-echo $(nowstamp) Backup $FROM/ 2>&1 | tolog
-restic backup ${FROM}/ \
-	--limit-upload $LIMIT_UPLOAD \
-	--limit-download $LIMIT_DOWNLOAD \
-	--no-scan \
-	--verbose 0 2>&1 | tolog || {
-  ERROR_MESSAGES="${ERROR_MESSAGES}[ERRO] Falha ao fazer backup de backup-all ($FROM) com restic.\n"
-  EXIT_CODE=1
-}
-
 # START ALFRESCO
 if [ $STOP == true ]; then
 	echo "$(nowstamp) Starting Alfresco application container..." 2>&1 | tolog
